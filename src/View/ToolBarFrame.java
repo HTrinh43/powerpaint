@@ -60,7 +60,9 @@ public class ToolBarFrame extends JFrame {
         final JToolBar toolBar = createToolBar();
         add(toolBar, BorderLayout.SOUTH);
         
-        setJMenuBar(createMenuBar());
+//        setJMenuBar(createMenuBar());
+        MenuBar menuBar = new MenuBar();
+        setJMenuBar(menuBar.createMenuBar());
 
         myPanel = new DrawingArea();
         add(myPanel, BorderLayout.CENTER);
@@ -73,6 +75,8 @@ public class ToolBarFrame extends JFrame {
      * Sets up all the Actions.
      */
     private void setupActions() {
+    	
+    	//adding toolbar here
         myColorActions = new ArrayList<>();
 
         myColorActions.add(new ColorAction("Gold", new ImageIcon("./images/yellow-ball.gif"),

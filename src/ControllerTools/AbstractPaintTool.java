@@ -1,4 +1,5 @@
-package Controller;
+package ControllerTools;
+
 import java.awt.Point;
 import java.awt.Shape;
 
