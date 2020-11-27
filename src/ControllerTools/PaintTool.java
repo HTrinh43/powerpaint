@@ -45,8 +45,8 @@ public interface PaintTool {
      * 
      * @param thePoint the next point to set
      */
-    void setNextPoint(Point thePoint);
-    
+    void setEndPoint(Point thePoint);
+    Point getEndPoint();
     /**
      * Resets the tool using default values.
      */

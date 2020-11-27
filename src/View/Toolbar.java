@@ -1,5 +1,4 @@
 package View;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -27,19 +26,16 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import Model.UWColors;
-import View.ToolBarFrame;
 
 
-public class ToolBarFrame extends JFrame {
-    
-    /** A generated serialization ID. */
+public class Toolbar {
     private static final long serialVersionUID = -4447570618384470786L;
 
     /** A constant for the string "Exit". */
     private static final String EXIT_STRING = "Exit";
 
     /** The panel used inside the frame. */
-    private final JPanel myPanel;
+
 
     /** The exit action. */
     private Action myExitAction;
@@ -52,20 +48,12 @@ public class ToolBarFrame extends JFrame {
     /**
      * Constructs a new ToolBarFrame with all its controls.
      */
-    public ToolBarFrame() {
-        super("Buttons with Actions");
+    public Toolbar() {
+
         
         setupActions(); // initializes myActions
 
-        final JToolBar toolBar = createToolBar();
-        add(toolBar, BorderLayout.SOUTH);
-        MenuBar menuBar = new MenuBar();
-        setJMenuBar(menuBar.createMenuBar());
 
-        myPanel = new DrawingArea();
-        add(myPanel, BorderLayout.CENTER);
-
-        pack();
 
     }
 
@@ -99,7 +87,7 @@ public class ToolBarFrame extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent theEvent) {
                 // close this Window
-                dispatchEvent(new WindowEvent(ToolBarFrame.this, WindowEvent.WINDOW_CLOSING)); 
+//                dispatchEvent(new WindowEvent(ToolBar.this, WindowEvent.WINDOW_CLOSING)); 
                 // do NOT call System.exit()
             }
         };
@@ -113,7 +101,7 @@ public class ToolBarFrame extends JFrame {
     /**
      * @return a fully-stocked tool bar.
      */
-    public JToolBar createToolBar() {
+    private JToolBar createToolBar() {
         final JToolBar bar = new JToolBar();
         bar.add(myExitAction);
         bar.addSeparator();
@@ -220,5 +208,4 @@ public class ToolBarFrame extends JFrame {
 //            myPanel.setBackground(myColor);
         }
     }
-
 }

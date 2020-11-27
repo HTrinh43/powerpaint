@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import View.DrawingArea;
+import View.ShapeGUI;
 import View.ToolBarFrame;
 
 
@@ -27,9 +28,7 @@ public class Application {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final ToolBarFrame toolbarFrame = new ToolBarFrame();
-                toolbarFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                toolbarFrame.setVisible(true);
+                new ShapeGUI().start();
             }
         });
 	}

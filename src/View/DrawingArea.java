@@ -1,5 +1,6 @@
 package View;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,16 +8,25 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
+import Model.ToolType;
 import Model.UWColors;
 //import toolbar.DrawingArea.MyMouseInputAdapter;
 //import toolbar.DrawingArea;
 import View.DrawingArea.MyMouseInputAdapter;
+import ControllerTools.EllipseTool;
+import ControllerTools.LineTool;
+import ControllerTools.PaintTool;
+import ControllerTools.RectangleTool;
 
 public class DrawingArea extends JPanel{
 
@@ -44,6 +54,10 @@ public class DrawingArea extends JPanel{
     /** The squares starting center y. */
     private static final int START_Y;
     
+    private PaintTool myCurrentTool;
+    private Color myPrimaryColor;
+    
+    private final List<Shape> myPreviousShapes;
     
     static {
         START_X = WIDTH / 2 - SQUARE_SIDE / 2;
@@ -53,10 +67,12 @@ public class DrawingArea extends JPanel{
     
     public DrawingArea() {
         super();
+        myPreviousShapes = new ArrayList<>();
         setBackground(Color.white);
         setOpaque(true);
-        mySquareCenterPoint = new Point(START_X, START_Y);
-        
+        mySquareCenterPoint = new Point(START_X, START_Y);       
+        myCurrentTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_L);
+        myPrimaryColor = UWColors.PURPLE.getColor();
         final MouseInputAdapter mia = new MyMouseInputAdapter();
         addMouseListener(mia);
         addMouseMotionListener(mia);
@@ -80,8 +96,18 @@ public class DrawingArea extends JPanel{
                       SQUARE_SIDE, SQUARE_SIDE);
         
         g2d.fill(square);
+        
+        //line thickness
+    	g2d.setStroke(new BasicStroke(3));
+        for (final Shape s : myPreviousShapes) {
 
+        	g2d.setColor(myPrimaryColor);
+            g2d.draw(s);
+        }
+        
+        g2d.draw(myCurrentTool.getShape());
     }
+    
     @Override
     public Dimension getMinimumSize() {
         return MIN_SIZE;
@@ -92,6 +118,13 @@ public class DrawingArea extends JPanel{
         return MIN_SIZE;
     }
     
+    public void setCurrentTool(final PaintTool theTool) {
+        myCurrentTool = theTool;
+    }
+    
+    public void setPrimaryColor(final Color theColor) {
+    	myPrimaryColor = theColor;
+    }
     /**
      * Mouse Adapter to handle Mouse Events and move the square around. 
      */
@@ -101,6 +134,7 @@ public class DrawingArea extends JPanel{
         @Override
         public void mousePressed(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
+            myCurrentTool.setStartPoint(theEvent.getPoint());
             repaint();
         }
 
@@ -108,14 +142,26 @@ public class DrawingArea extends JPanel{
         @Override
         public void mouseDragged(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
+            myCurrentTool.setEndPoint(theEvent.getPoint());
+            
+            if (myCurrentTool.getName() == ToolType.PENCIL.getTool()) {
+            	myPreviousShapes.add(myCurrentTool.getShape());
+            	myCurrentTool.setStartPoint(theEvent.getPoint());
+            }
             repaint();
         }
         
-//        @Override
-//        public void mouseReleased(final MouseEvent theEvent) {
-//            mySquareCenterPoint = getCenterPoint(theEvent);
+        @Override
+        public void mouseReleased(final MouseEvent theEvent) {
+            mySquareCenterPoint = getCenterPoint(theEvent);
+            
+            if (myCurrentTool.getName() == ToolType.LINE.getTool() 
+            		|| myCurrentTool.getName() == ToolType.ELLIPSE.getTool()
+            		|| myCurrentTool.getName() == ToolType.RECTANGLE.getTool()) {
+            	myPreviousShapes.add(myCurrentTool.getShape());
+        }
 //            repaint();
-//        }
+        }
         
         /**
          * Returns a new Point that is the center of the square based
