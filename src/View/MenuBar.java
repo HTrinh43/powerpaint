@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.ButtonGroup;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -21,11 +22,17 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import Model.ToolType;
 import Model.UWColors;
+import ControllerTools.EllipseTool;
+import ControllerTools.LineTool;
 import ControllerTools.PaintTool;
+import ControllerTools.PencilTool;
+import ControllerTools.RectangleTool;
 
 
-public class MenuBar extends JPanel implements PropertyChangeListener{
+public class MenuBar extends JFrame implements PropertyChangeListener, ActionListener{
 	
 	/**
 	 * 
@@ -33,32 +40,34 @@ public class MenuBar extends JPanel implements PropertyChangeListener{
 	private static final long serialVersionUID = 2445544222417987308L;
 
 
-	public MenuBar() {
 
-		myPrimaryColorDisplayPanel = new JPanel();
-		mySecondaryColorDisplayPanel = new JPanel();
-		myPrimaryColor = UWColors.PURPLE.getColor();
-		myPrimaryColor = UWColors.GOLD.getColor();
-		myBackgroundDialog = null;
-		setUp();
-	}
 	//Create a background dialog 
-	private JDialog myBackgroundDialog;
-	
     private static final Dimension BUTTON_SIZE = new Dimension(26, 26);
 	
     private JSlider mySlider;
     /** The panel that visually displays ONLY the BLUE value for the color. */
-    private final JPanel myPrimaryColorDisplayPanel;
+    private final JPanel myPrimaryColorDisplayPanel; 
     
-    private final JPanel mySecondaryColorDisplayPanel;
+    private final JPanel mySecondaryColorDisplayPanel;    
     
-    private Color myPrimaryColor;
+    private Color myPrimaryColor;   
     
     private Color mySecondaryColor;
     
     private PaintTool myCurrentTool;
     
+    private DrawingArea myPane;
+    
+    
+    
+	public MenuBar(DrawingArea thePane) {
+		myPane = thePane;
+		myPrimaryColorDisplayPanel = new JPanel();
+		mySecondaryColorDisplayPanel = new JPanel();
+		myPrimaryColor = UWColors.PURPLE.getColor();
+		mySecondaryColor = UWColors.GOLD.getColor();
+		setUp();
+	}
 	
 	public JMenuBar createMenuBar() {
 		final JMenuBar menuBar = new JMenuBar();
@@ -72,11 +81,6 @@ public class MenuBar extends JPanel implements PropertyChangeListener{
         inThickness.add(mySlider);
         inThickness.setMnemonic(KeyEvent.VK_T);
         
-
-//        JPanel primaryColorPanel = new JPanel();
-//        primaryColorPanel.add(myPrimaryColorDisplayPanel);
-//        primaryColorPanel.add(new JLabel("Primary Color"));
-        //setup Color Choose for Primary Color
         final JMenuItem primaryColor = new JMenuItem("Primary Color");
         primaryColor.setMnemonic(KeyEvent.VK_P);
         //Primary listener
@@ -84,28 +88,21 @@ public class MenuBar extends JPanel implements PropertyChangeListener{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JColorChooser choosenColor = new JColorChooser();
 				//new background dialog to choose a color
-				myBackgroundDialog = JColorChooser.createDialog
-						(primaryColor,
-								"Choose a Color",
-								false,
-								choosenColor,
-								new ActionListener()
-								{public void actionPerformed(ActionEvent evvv){
-									myPrimaryColorDisplayPanel.setBackground(choosenColor.getColor());}},
-								null);	
-				myBackgroundDialog.setVisible(true);
+				Color color = JColorChooser.showDialog
+						(null,"Choose a Color", UWColors.PURPLE.getColor());
+						myPrimaryColor = color;
+						myPane.setPrimaryColor(myPrimaryColor);
 			}});      
-        
+        	
         final JMenuItem clear = new JMenuItem("Clear");
         clear.setMnemonic(KeyEvent.VK_C);
         optionsMenu.add(inThickness);
         optionsMenu.addSeparator();
         optionsMenu.add(primaryColor);
-        optionsMenu.add(mySecondaryColorDisplayPanel);
         optionsMenu.addSeparator();
         optionsMenu.add(clear);
+        
 //        optionsMenu.add(primaryColorPanel);
 
         
@@ -113,19 +110,63 @@ public class MenuBar extends JPanel implements PropertyChangeListener{
 		//Tools Menu
 		final JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic(KeyEvent.VK_T);
-		
+		//create tool buttons
         final JRadioButton pencilB = new JRadioButton("Pencil", true);
         final JRadioButton lineB = new JRadioButton("Line", false);
         final JRadioButton rectangleB = new JRadioButton("Rectangle", false);
         final JRadioButton ellipseB = new JRadioButton("Ellipse", false);
         final JRadioButton erazerB = new JRadioButton("Erazer", false);
 		
+        pencilB.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//new background dialog to choose a color
+				myCurrentTool = new PencilTool(ToolType.PENCIL, KeyEvent.VK_P);
+				myPane.setCurrentTool(myCurrentTool);
+			}});      
+        
+        lineB.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//new background dialog to choose a color
+				myCurrentTool = new LineTool(ToolType.LINE, KeyEvent.VK_L);
+				myPane.setCurrentTool(myCurrentTool);
+			}}); 
+        
+        rectangleB.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//new background dialog to choose a color
+				myCurrentTool = new RectangleTool(ToolType.RECTANGLE, KeyEvent.VK_R);
+				myPane.setCurrentTool(myCurrentTool);
+			}}); 
+        
+        ellipseB.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//new background dialog to choose a color
+				myCurrentTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_E);
+				myPane.setCurrentTool(myCurrentTool);
+			}}); 
+        
         pencilB.setMnemonic(KeyEvent.VK_P);
         lineB.setMnemonic(KeyEvent.VK_L);
         rectangleB.setMnemonic(KeyEvent.VK_R);
         ellipseB.setMnemonic(KeyEvent.VK_E);
         erazerB.setMnemonic(KeyEvent.VK_A);
         
+        //add listener
+        pencilB.addActionListener(this);
+        lineB.addActionListener(this);
+        rectangleB.addActionListener(this);
+        ellipseB.addActionListener(this);
+        erazerB.addActionListener(this);
+        
+        //groups tool buttons
         final ButtonGroup group = new ButtonGroup();
         group.add(pencilB);
         group.add(lineB);
@@ -168,16 +209,18 @@ public class MenuBar extends JPanel implements PropertyChangeListener{
 		return menuBar;
 	}
 	
-	private void addListener() {
-		
+	private JMenuItem createNewMenuItem(JMenu theMenu, String theText, int theKey) {
+		JMenuItem menuItem = new JMenuItem(theText);
+		menuItem.setMnemonic(theKey);
+		theMenu.add(menuItem);
+		return menuItem;
 	}
 	
+
     public void setCurrentTool(final PaintTool theTool) {
         myCurrentTool = theTool;
     }
     
-   
-	
 	public Color getPrimaryColor() {
 		return this.myPrimaryColor;
 	}
@@ -215,5 +258,11 @@ public class MenuBar extends JPanel implements PropertyChangeListener{
 	public void propertyChange(PropertyChangeEvent evt) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+//		if (e.getSource()== )
 	}
 }

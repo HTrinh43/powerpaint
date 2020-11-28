@@ -39,33 +39,24 @@ public class ToolBarFrame extends JFrame {
     private static final String EXIT_STRING = "Exit";
 
     /** The panel used inside the frame. */
-    private final JPanel myPanel;
+//    private final JPanel myPanel;
 
     /** The exit action. */
     private Action myExitAction;
 
     /** A list of color actions. */
     private List<Action> myToolsAction;
+    
+    private DrawingArea myPane;
 
     // Constructor
 
     /**
      * Constructs a new ToolBarFrame with all its controls.
      */
-    public ToolBarFrame() {
-        super("Buttons with Actions");
-        
+    public ToolBarFrame(DrawingArea thePane) {
+        myPane = thePane;
         setupActions(); // initializes myActions
-
-        final JToolBar toolBar = createToolBar();
-        add(toolBar, BorderLayout.SOUTH);
-        MenuBar menuBar = new MenuBar();
-        setJMenuBar(menuBar.createMenuBar());
-
-        myPanel = new DrawingArea();
-        add(myPanel, BorderLayout.CENTER);
-
-        pack();
 
     }
 
@@ -156,7 +147,6 @@ public class ToolBarFrame extends JFrame {
             btngrp.add(btn);
             colorMenu.add(btn);
         }
-
         menuBar.add(colorMenu);
 
         return menuBar;
@@ -217,7 +207,6 @@ public class ToolBarFrame extends JFrame {
          */
         @Override
         public void actionPerformed(final ActionEvent theEvent) {
-//            myPanel.setBackground(myColor);
         }
     }
 

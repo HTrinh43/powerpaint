@@ -9,12 +9,20 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
 
+import ControllerTools.EllipseTool;
 import ControllerTools.LineTool;
+import ControllerTools.PencilTool;
+import ControllerTools.RectangleTool;
 import View.DrawingArea;
 import Model.ToolType;
 
-public class ShapeGUI implements PropertyChangeListener {
-    /** The top level window for this application. */
+public class ShapeGUI extends JFrame implements PropertyChangeListener {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4266589551161261270L;
+
+	/** The top level window for this application. */
     private final JFrame myFrame;
     
     /** A panel for drawing shapes. */
@@ -24,40 +32,58 @@ public class ShapeGUI implements PropertyChangeListener {
     
     private final MenuBar myMenuBar;
     /** A tool for drawing lines. */
-    private final LineTool myLineTool;
+    private LineTool myLineTool;
+    private PencilTool myPencilTool;
+    private EllipseTool myEllipseTool;
+    private RectangleTool myRectangleTool;
     
     public ShapeGUI() {
+        super("Power Paint");
         myFrame = new JFrame();
         myPanel = new DrawingArea();
-        myToolBar = new ToolBarFrame();
-        myMenuBar = new MenuBar();
+        myToolBar = new ToolBarFrame(myPanel);
+        myMenuBar = new MenuBar(myPanel);
         myLineTool = new LineTool(ToolType.LINE, KeyEvent.VK_L);
-        
+        myPencilTool = new PencilTool(ToolType.PENCIL, KeyEvent.VK_P);
+        myEllipseTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_E);
+        myRectangleTool = new RectangleTool(ToolType.RECTANGLE, KeyEvent.VK_R);
+        add(myPanel, BorderLayout.CENTER);
+        this.setVisible(true);
+        pack();
 
     }
     
     public void start() {
-        myFrame.add(myPanel, BorderLayout.CENTER);        
+       
         myToolBar.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        myToolBar.setVisible(true);
-        myPanel.setCurrentTool(myLineTool);
+        //set tool
+        myPanel.setCurrentTool(myPencilTool);
         final JToolBar toolBar = myToolBar.createToolBar();
-        myFrame.add(toolBar, BorderLayout.SOUTH);
+        this.add(toolBar, BorderLayout.SOUTH);
         
         JMenuBar myJmenubar = myMenuBar.createMenuBar();
+        this.setJMenuBar(myJmenubar);
+        myFrame.pack();
         
 
-        myFrame.setJMenuBar(myJmenubar);
-        myFrame.pack();
     }
     
-    private void addListener() {
+
+    
+    class shapeGUIListener implements PropertyChangeListener {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+
+			
+		}
     	
     }
+    
     @Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		myPanel.setPrimaryColor(myMenuBar.getPrimaryColor());
-		System.out.println("get gere");
+
 	}
 
 }

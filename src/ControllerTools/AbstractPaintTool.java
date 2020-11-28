@@ -6,7 +6,7 @@ import Model.ToolType;
 
 public class AbstractPaintTool implements PaintTool {
     public static final Point NO_POINT = new Point(-50, -50);
-    private final ToolType myName;
+    protected final ToolType myName;
     private final int myMnemonic;
 	private Point myStartPoint;
 	private Point myEndPoint;

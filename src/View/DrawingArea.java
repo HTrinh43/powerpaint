@@ -26,6 +26,7 @@ import View.DrawingArea.MyMouseInputAdapter;
 import ControllerTools.EllipseTool;
 import ControllerTools.LineTool;
 import ControllerTools.PaintTool;
+import ControllerTools.PencilTool;
 import ControllerTools.RectangleTool;
 
 public class DrawingArea extends JPanel{
@@ -55,8 +56,12 @@ public class DrawingArea extends JPanel{
     private static final int START_Y;
     
     private PaintTool myCurrentTool;
+//    private LineTool myLineTool;
+//    private PencilTool myPencilTool;
+//    private EllipseTool myEllipseTool;
+//    private RectangleTool myRectangleTool;
     private Color myPrimaryColor;
-    
+    private int count;
     private final List<Shape> myPreviousShapes;
     
     static {
@@ -67,15 +72,25 @@ public class DrawingArea extends JPanel{
     
     public DrawingArea() {
         super();
-        myPreviousShapes = new ArrayList<>();
         setBackground(Color.white);
         setOpaque(true);
-        mySquareCenterPoint = new Point(START_X, START_Y);       
-        myCurrentTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_L);
+        //setup tools
+//        myPencilTool = new PencilTool(ToolType.PENCIL, KeyEvent.VK_P);
+//        myLineTool = new LineTool(ToolType.LINE, KeyEvent.VK_L);
+//        myEllipseTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_E);
+//        myRectangleTool = new RectangleTool(ToolType.RECTANGLE, KeyEvent.VK_R);
+        //
+        myPreviousShapes = new ArrayList<>();
+
+        mySquareCenterPoint = new Point(START_X, START_Y);  
+        
+        myCurrentTool = null;
+        
         myPrimaryColor = UWColors.PURPLE.getColor();
         final MouseInputAdapter mia = new MyMouseInputAdapter();
         addMouseListener(mia);
         addMouseMotionListener(mia);
+        count = 0;
     }
     
     @Override
@@ -96,16 +111,16 @@ public class DrawingArea extends JPanel{
                       SQUARE_SIDE, SQUARE_SIDE);
         
         g2d.fill(square);
-        
+
         //line thickness
     	g2d.setStroke(new BasicStroke(3));
-        for (final Shape s : myPreviousShapes) {
-
-        	g2d.setColor(myPrimaryColor);
-            g2d.draw(s);
-        }
-        
+    	for (Shape s : myPreviousShapes) {
+    	g2d.setColor(myPrimaryColor);
+        g2d.draw(s);
+        System.out.println(myPreviousShapes.indexOf(s));
+    	}
         g2d.draw(myCurrentTool.getShape());
+//        count++;
     }
     
     @Override
