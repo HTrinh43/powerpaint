@@ -32,14 +32,12 @@ import ControllerTools.PencilTool;
 import ControllerTools.RectangleTool;
 
 
-public class MenuBar extends JFrame implements PropertyChangeListener, ActionListener{
+public class MenuBar implements ActionListener{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2445544222417987308L;
-
-
 
 	//Create a background dialog 
     private static final Dimension BUTTON_SIZE = new Dimension(26, 26);
@@ -153,6 +151,15 @@ public class MenuBar extends JFrame implements PropertyChangeListener, ActionLis
 				myPane.setCurrentTool(myCurrentTool);
 			}}); 
         
+        erazerB.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//new background dialog to choose a color
+				myCurrentTool = new PencilTool(ToolType.ERASER, KeyEvent.VK_S);
+				myPane.setCurrentTool(myCurrentTool);
+			}});      
+        
         pencilB.setMnemonic(KeyEvent.VK_P);
         lineB.setMnemonic(KeyEvent.VK_L);
         rectangleB.setMnemonic(KeyEvent.VK_R);
@@ -198,24 +205,14 @@ public class MenuBar extends JFrame implements PropertyChangeListener, ActionLis
 					    + "TCSS 305 Assignment 4",
 					    "About",
 					    JOptionPane.PLAIN_MESSAGE);
-			}
-        	
+			}	
         });
-        
-        
+               
         menuBar.add(optionsMenu);
 		menuBar.add(toolsMenu);
 		menuBar.add(helpMenu);
 		return menuBar;
 	}
-	
-	private JMenuItem createNewMenuItem(JMenu theMenu, String theText, int theKey) {
-		JMenuItem menuItem = new JMenuItem(theText);
-		menuItem.setMnemonic(theKey);
-		theMenu.add(menuItem);
-		return menuItem;
-	}
-	
 
     public void setCurrentTool(final PaintTool theTool) {
         myCurrentTool = theTool;
@@ -235,14 +232,17 @@ public class MenuBar extends JFrame implements PropertyChangeListener, ActionLis
 	
 	private void setUp() {
 		//setup Slider
-        mySlider = new JSlider(0, 20,10);
+        mySlider = new JSlider(0, 20, 1);
         mySlider.setPaintTicks(true);
         mySlider.setPaintLabels(true);
         mySlider.setMinorTickSpacing(1);
         mySlider.setMajorTickSpacing(5);
         ChangeListener cl = e -> {
             JSlider x = (JSlider) e.getSource();
-            x.getValue();
+            int thickness =  x.getValue();       
+            myPane.setThickness(thickness);
+            myPane.setCursorThickness();
+            
         };
         mySlider.addChangeListener(cl);
 
@@ -255,14 +255,6 @@ public class MenuBar extends JFrame implements PropertyChangeListener, ActionLis
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
 	public void actionPerformed(ActionEvent e) {
-//		if (e.getSource()== )
 	}
 }

@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
+import Model.ShapeModel;
 import Model.ToolType;
 import Model.UWColors;
 //import toolbar.DrawingArea.MyMouseInputAdapter;
@@ -43,17 +44,20 @@ public class DrawingArea extends JPanel{
     private static final int HEIGHT = 500;
 
     /** The length of the square's sides. */
-    private static final int SQUARE_SIDE = 5;
+    private static int myCursorThickness = 1;
     
     /** The minimum size this component should be. */
     private static final Dimension MIN_SIZE = new Dimension(WIDTH, HEIGHT);
 
     /** The squares starting center x. */
     private static final int START_X;
-    
-    
+        
     /** The squares starting center y. */
     private static final int START_Y;
+    
+    private int myThickness;
+    
+    private Color myBackgroundColor;
     
     private PaintTool myCurrentTool;
 //    private LineTool myLineTool;
@@ -61,12 +65,11 @@ public class DrawingArea extends JPanel{
 //    private EllipseTool myEllipseTool;
 //    private RectangleTool myRectangleTool;
     private Color myPrimaryColor;
-    private int count;
-    private final List<Shape> myPreviousShapes;
+    private final List<ShapeModel> myPreviousShapes;
     
     static {
-        START_X = WIDTH / 2 - SQUARE_SIDE / 2;
-        START_Y = HEIGHT / 2 - SQUARE_SIDE / 2;
+        START_X = WIDTH / 2 - myCursorThickness / 2;
+        START_Y = HEIGHT / 2 - myCursorThickness / 2;
     }
     private Point mySquareCenterPoint;
     
@@ -86,11 +89,14 @@ public class DrawingArea extends JPanel{
         
         myCurrentTool = null;
         
+        myThickness = 1;
+        
+        myBackgroundColor = this.getBackground();
+        
         myPrimaryColor = UWColors.PURPLE.getColor();
         final MouseInputAdapter mia = new MyMouseInputAdapter();
         addMouseListener(mia);
         addMouseMotionListener(mia);
-        count = 0;
     }
     
     @Override
@@ -108,19 +114,20 @@ public class DrawingArea extends JPanel{
         //Starting Painting things!
         final Rectangle2D square = new Rectangle2D.Double(
                       mySquareCenterPoint.getX(), mySquareCenterPoint.getY(), 
-                      SQUARE_SIDE, SQUARE_SIDE);
+                      myCursorThickness, myCursorThickness);
         
         g2d.fill(square);
 
         //line thickness
-    	g2d.setStroke(new BasicStroke(3));
-    	for (Shape s : myPreviousShapes) {
-    	g2d.setColor(myPrimaryColor);
-        g2d.draw(s);
-        System.out.println(myPreviousShapes.indexOf(s));
+    	if (myCurrentTool.getName() != ToolType.ERASER.getTool()) {
+    		g2d.setColor(myPrimaryColor);
+    	}
+    	for (ShapeModel s : myPreviousShapes) {
+    		g2d.setStroke(new BasicStroke(s.getThickness()));
+    		g2d.setColor(s.getColor());
+    		g2d.draw(s.getShape());
     	}
         g2d.draw(myCurrentTool.getShape());
-//        count++;
     }
     
     @Override
@@ -140,6 +147,14 @@ public class DrawingArea extends JPanel{
     public void setPrimaryColor(final Color theColor) {
     	myPrimaryColor = theColor;
     }
+    
+    public void setThickness(int theThickness) {
+    	myThickness = theThickness;
+    }
+    
+    public void setCursorThickness() {
+    	myCursorThickness = myThickness;
+    }
     /**
      * Mouse Adapter to handle Mouse Events and move the square around. 
      */
@@ -152,7 +167,12 @@ public class DrawingArea extends JPanel{
             myCurrentTool.setStartPoint(theEvent.getPoint());
             repaint();
         }
-
+        
+        @Override
+        public void mouseMoved(MouseEvent theEvent) {
+            mySquareCenterPoint = getCenterPoint(theEvent);
+            repaint();
+        }
         
         @Override
         public void mouseDragged(final MouseEvent theEvent) {
@@ -160,7 +180,11 @@ public class DrawingArea extends JPanel{
             myCurrentTool.setEndPoint(theEvent.getPoint());
             
             if (myCurrentTool.getName() == ToolType.PENCIL.getTool()) {
-            	myPreviousShapes.add(myCurrentTool.getShape());
+            	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(),myPrimaryColor, myThickness));
+            	myCurrentTool.setStartPoint(theEvent.getPoint());
+            }
+            else if (myCurrentTool.getName() == ToolType.ERASER.getTool()) {
+            	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), myBackgroundColor, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
             }
             repaint();
@@ -173,9 +197,8 @@ public class DrawingArea extends JPanel{
             if (myCurrentTool.getName() == ToolType.LINE.getTool() 
             		|| myCurrentTool.getName() == ToolType.ELLIPSE.getTool()
             		|| myCurrentTool.getName() == ToolType.RECTANGLE.getTool()) {
-            	myPreviousShapes.add(myCurrentTool.getShape());
+            	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(),myPrimaryColor, myThickness));
         }
-//            repaint();
         }
         
         /**
@@ -186,8 +209,8 @@ public class DrawingArea extends JPanel{
          * @return a new Point that is the center of the square
          */
         private Point getCenterPoint(final MouseEvent theEvent) {
-            final int x = theEvent.getX() - SQUARE_SIDE / 2; 
-            final int y = theEvent.getY() - SQUARE_SIDE / 2; 
+            final int x = theEvent.getX() - myCursorThickness / 2; 
+            final int y = theEvent.getY() - myCursorThickness / 2; 
             return new Point(x, y);
         }
     }

@@ -26,6 +26,12 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import ControllerTools.EllipseTool;
+import ControllerTools.EraserTool;
+import ControllerTools.LineTool;
+import ControllerTools.PencilTool;
+import ControllerTools.RectangleTool;
+import Model.ToolType;
 import Model.UWColors;
 import View.ToolBarFrame;
 
@@ -68,17 +74,12 @@ public class ToolBarFrame extends JFrame {
     	//adding toolbar here
         myToolsAction = new ArrayList<>();
 
-        myToolsAction.add(new ToolAction("Pencil", new ImageIcon("./images/pencil.gif"),
-                                             UWColors.GOLD.getColor()));
+        myToolsAction.add(new ToolAction("Pencil", new ImageIcon("./images/pencil.gif"), ToolType.PENCIL));
         
-        myToolsAction.add(new ToolAction("Line", new ImageIcon("./images/line.gif"), 
-        		UWColors.PURPLE.getColor()));
-        myToolsAction.add(new ToolAction("Retangle", new ImageIcon("./images/rectangle.gif"), 
-        		UWColors.PURPLE.getColor()));
-        myToolsAction.add(new ToolAction("Ellipse", new ImageIcon("./images/ellipse.gif"), 
-        		UWColors.PURPLE.getColor()));
-        myToolsAction.add(new ToolAction("Eraser", new ImageIcon("./images/eraser.gif"), 
-        		UWColors.PURPLE.getColor()));
+        myToolsAction.add(new ToolAction("Line", new ImageIcon("./images/line.gif"), ToolType.LINE));
+        myToolsAction.add(new ToolAction("Retangle", new ImageIcon("./images/rectangle.gif"), ToolType.RECTANGLE));
+        myToolsAction.add(new ToolAction("Ellipse", new ImageIcon("./images/ellipse.gif"), ToolType.ELLIPSE));
+        myToolsAction.add(new ToolAction("Eraser", new ImageIcon("./images/eraser.gif"), ToolType.ERASER));
         
 
         // anonymous inner class in use here
@@ -163,8 +164,6 @@ public class ToolBarFrame extends JFrame {
         /** A generated serialization ID. */
         private static final long serialVersionUID = 5378597116905801274L;
         
-        /** The color to use. */
-        private final Color myColor;
 
         /**
          * Constructs an action with the specified name and icon to set the
@@ -172,9 +171,9 @@ public class ToolBarFrame extends JFrame {
          * 
          * @param theName The name.
          * @param theIcon The icon.
-         * @param theColor The color.
          */
-        ToolAction(final String theName, final Icon theIcon, final Color theColor) {
+        private final ToolType myTool;
+        ToolAction(final String theName, final Icon theIcon, ToolType theTool) {
             super(theName);
             
             // small icons are usually assigned to the menu
@@ -196,8 +195,7 @@ public class ToolBarFrame extends JFrame {
             
             // coordinate button selection
 //            putValue(Action.SELECTED_KEY, true);
-            
-            myColor = theColor;
+            myTool = theTool;
         }
 
         /**
@@ -207,6 +205,21 @@ public class ToolBarFrame extends JFrame {
          */
         @Override
         public void actionPerformed(final ActionEvent theEvent) {
+        	if(this.myTool == ToolType.LINE) {
+        		myPane.setCurrentTool(new LineTool(myTool, KeyEvent.VK_L));
+        	}
+        	else if(this.myTool == ToolType.ELLIPSE) {
+        		myPane.setCurrentTool(new EllipseTool(myTool, KeyEvent.VK_E));
+        	}
+        	else if(this.myTool == ToolType.ERASER) {
+        		myPane.setCurrentTool(new EraserTool(myTool, KeyEvent.VK_S));
+        	}
+        	else if(this.myTool == ToolType.PENCIL) {
+        		myPane.setCurrentTool(new PencilTool(myTool, KeyEvent.VK_P));
+        	}
+        	else if(this.myTool == ToolType.RECTANGLE) {
+        		myPane.setCurrentTool(new RectangleTool(myTool, KeyEvent.VK_R));
+        	}
         }
     }
 

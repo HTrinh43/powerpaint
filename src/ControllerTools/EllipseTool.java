@@ -17,11 +17,11 @@ public class EllipseTool extends AbstractPaintTool {
     public Shape getShape() {
 		Point startPoint = getStartPoint();
 		Point endPoint = getEndPoint();
-		Point centerPoint = new Point((int)endPoint.getX()
-				,(int)(startPoint.getY()));
+//		Point centerPoint = new Point((int)endPoint.getX()
+//				,(int)(startPoint.getY()));
         final Ellipse2D.Double circle = new Ellipse2D.Double();
-        circle.setFrameFromCenter(centerPoint, endPoint);
-//        circle.setFrameFromDiagonal(startPoint, endPoint);
+//        circle.setFrameFromCenter(centerPoint, endPoint);
+        circle.setFrameFromDiagonal(startPoint, endPoint);
 
         return circle;
     }

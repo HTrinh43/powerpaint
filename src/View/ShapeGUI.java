@@ -50,6 +50,7 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener {
         add(myPanel, BorderLayout.CENTER);
         this.setVisible(true);
         pack();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
     
