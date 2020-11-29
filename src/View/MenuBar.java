@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JColorChooser;
@@ -26,6 +27,7 @@ import javax.swing.event.ChangeListener;
 import Model.ToolType;
 import Model.UWColors;
 import ControllerTools.EllipseTool;
+import ControllerTools.EraserTool;
 import ControllerTools.LineTool;
 import ControllerTools.PaintTool;
 import ControllerTools.PencilTool;
@@ -79,7 +81,7 @@ public class MenuBar implements ActionListener{
         inThickness.add(mySlider);
         inThickness.setMnemonic(KeyEvent.VK_T);
         
-        final JMenuItem primaryColor = new JMenuItem("Primary Color");
+        final JMenuItem primaryColor = new JMenuItem("Primary Color...");
         primaryColor.setMnemonic(KeyEvent.VK_P);
         //Primary listener
         primaryColor.addActionListener(new ActionListener() {
@@ -92,12 +94,28 @@ public class MenuBar implements ActionListener{
 						myPrimaryColor = color;
 						myPane.setPrimaryColor(myPrimaryColor);
 			}});      
+        
+        final JMenuItem secondaryColor = new JMenuItem("Secondary Color...");
+        secondaryColor.setMnemonic(KeyEvent.VK_S);
+        //Primary listener
+        secondaryColor.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//new background dialog to choose a color
+				Color color = JColorChooser.showDialog
+						(null,"Choose a Color", UWColors.PURPLE.getColor());
+						mySecondaryColor = color;
+						myPane.setSecondaryColor(mySecondaryColor);
+			}});      
         	
         final JMenuItem clear = new JMenuItem("Clear");
         clear.setMnemonic(KeyEvent.VK_C);
+        clear.setEnabled(false);
         optionsMenu.add(inThickness);
         optionsMenu.addSeparator();
         optionsMenu.add(primaryColor);
+        optionsMenu.add(secondaryColor);
         optionsMenu.addSeparator();
         optionsMenu.add(clear);
         
@@ -106,86 +124,8 @@ public class MenuBar implements ActionListener{
         
         
 		//Tools Menu
-		final JMenu toolsMenu = new JMenu("Tools");
+		final JMenu toolsMenu = this.createToolMenu();
 		toolsMenu.setMnemonic(KeyEvent.VK_T);
-		//create tool buttons
-        final JRadioButton pencilB = new JRadioButton("Pencil", true);
-        final JRadioButton lineB = new JRadioButton("Line", false);
-        final JRadioButton rectangleB = new JRadioButton("Rectangle", false);
-        final JRadioButton ellipseB = new JRadioButton("Ellipse", false);
-        final JRadioButton erazerB = new JRadioButton("Erazer", false);
-		
-        pencilB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//new background dialog to choose a color
-				myCurrentTool = new PencilTool(ToolType.PENCIL, KeyEvent.VK_P);
-				myPane.setCurrentTool(myCurrentTool);
-			}});      
-        
-        lineB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//new background dialog to choose a color
-				myCurrentTool = new LineTool(ToolType.LINE, KeyEvent.VK_L);
-				myPane.setCurrentTool(myCurrentTool);
-			}}); 
-        
-        rectangleB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//new background dialog to choose a color
-				myCurrentTool = new RectangleTool(ToolType.RECTANGLE, KeyEvent.VK_R);
-				myPane.setCurrentTool(myCurrentTool);
-			}}); 
-        
-        ellipseB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//new background dialog to choose a color
-				myCurrentTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_E);
-				myPane.setCurrentTool(myCurrentTool);
-			}}); 
-        
-        erazerB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//new background dialog to choose a color
-				myCurrentTool = new PencilTool(ToolType.ERASER, KeyEvent.VK_S);
-				myPane.setCurrentTool(myCurrentTool);
-			}});      
-        
-        pencilB.setMnemonic(KeyEvent.VK_P);
-        lineB.setMnemonic(KeyEvent.VK_L);
-        rectangleB.setMnemonic(KeyEvent.VK_R);
-        ellipseB.setMnemonic(KeyEvent.VK_E);
-        erazerB.setMnemonic(KeyEvent.VK_A);
-        
-        //add listener
-        pencilB.addActionListener(this);
-        lineB.addActionListener(this);
-        rectangleB.addActionListener(this);
-        ellipseB.addActionListener(this);
-        erazerB.addActionListener(this);
-        
-        //groups tool buttons
-        final ButtonGroup group = new ButtonGroup();
-        group.add(pencilB);
-        group.add(lineB);
-        group.add(rectangleB);
-        group.add(ellipseB);
-        group.add(erazerB);
-        
-        toolsMenu.add(pencilB);
-        toolsMenu.add(lineB);
-        toolsMenu.add(rectangleB);
-        toolsMenu.add(ellipseB);
-        toolsMenu.add(erazerB);
         
         //Help Menu
 		final JMenu helpMenu = new JMenu("Help");
@@ -253,8 +193,57 @@ public class MenuBar implements ActionListener{
         mySecondaryColorDisplayPanel.setBackground(mySecondaryColor);
         
 	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
+	}
+	
+	private JMenu createToolMenu() {
+		JMenu menu = new JMenu("Tools");
+		ArrayList<JRadioButton> buttonList = new ArrayList<>();
+		buttonList.add(createRadioButton("Pencil", true, new MenuBarAction(ToolType.PENCIL), KeyEvent.VK_P));
+		buttonList.add(createRadioButton("Line", false, new MenuBarAction(ToolType.LINE), KeyEvent.VK_L));
+		buttonList.add(createRadioButton("Rectangle", false, new MenuBarAction(ToolType.RECTANGLE), KeyEvent.VK_R));
+		buttonList.add(createRadioButton("Ellipse", false, new MenuBarAction(ToolType.ELLIPSE), KeyEvent.VK_E));
+		buttonList.add(createRadioButton("Eraser", false, new MenuBarAction(ToolType.ERASER), KeyEvent.VK_A));
+		
+		final ButtonGroup btngrp = new ButtonGroup();
+		for (JRadioButton button : buttonList) {
+			btngrp.add(button);
+			menu.add(button);
+		}
+		return menu;
+	}
+	
+	private JRadioButton createRadioButton(String theName, boolean theBoolean, ActionListener theListener, int theMnemonic) {
+		JRadioButton button = new JRadioButton(theName, theBoolean);
+		button.addActionListener(theListener);
+		button.setMnemonic(theMnemonic);
+		return button;
+	}
+	class MenuBarAction implements ActionListener {
+
+		private final ToolType myTool;
+		MenuBarAction (final ToolType theTool){
+			this.myTool = theTool;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(this.myTool == ToolType.LINE) {
+        		myPane.setCurrentTool(new LineTool(myTool, KeyEvent.VK_L));
+        	}
+        	else if(this.myTool == ToolType.ELLIPSE) {
+        		myPane.setCurrentTool(new EllipseTool(myTool, KeyEvent.VK_E));
+        	}
+        	else if(this.myTool == ToolType.ERASER) {
+        		myPane.setCurrentTool(new EraserTool(myTool, KeyEvent.VK_S));
+        	}
+        	else if(this.myTool == ToolType.PENCIL) {
+        		myPane.setCurrentTool(new PencilTool(myTool, KeyEvent.VK_P));
+        	}
+        	else if(this.myTool == ToolType.RECTANGLE) {
+        		myPane.setCurrentTool(new RectangleTool(myTool, KeyEvent.VK_R));
+        	}	
+		}
+		
 	}
 }

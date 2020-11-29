@@ -63,7 +63,6 @@ public class ToolBarFrame extends JFrame {
     public ToolBarFrame(DrawingArea thePane) {
         myPane = thePane;
         setupActions(); // initializes myActions
-
     }
 
     /**
@@ -74,14 +73,16 @@ public class ToolBarFrame extends JFrame {
     	//adding toolbar here
         myToolsAction = new ArrayList<>();
 
-        myToolsAction.add(new ToolAction("Pencil", new ImageIcon("./images/pencil.gif"), ToolType.PENCIL));
-        
-        myToolsAction.add(new ToolAction("Line", new ImageIcon("./images/line.gif"), ToolType.LINE));
-        myToolsAction.add(new ToolAction("Retangle", new ImageIcon("./images/rectangle.gif"), ToolType.RECTANGLE));
-        myToolsAction.add(new ToolAction("Ellipse", new ImageIcon("./images/ellipse.gif"), ToolType.ELLIPSE));
-        myToolsAction.add(new ToolAction("Eraser", new ImageIcon("./images/eraser.gif"), ToolType.ERASER));
-        
-
+        myToolsAction.add(new ToolAction("Pencil", new ImageIcon("./images/pencil.gif"), 
+        		ToolType.PENCIL, KeyEvent.VK_P));   
+        myToolsAction.add(new ToolAction("Line", new ImageIcon("./images/line.gif"), 
+        		ToolType.LINE, KeyEvent.VK_L));
+        myToolsAction.add(new ToolAction("Retangle", new ImageIcon("./images/rectangle.gif"), 
+        		ToolType.RECTANGLE, KeyEvent.VK_R));
+        myToolsAction.add(new ToolAction("Ellipse", new ImageIcon("./images/ellipse.gif"), 
+        		ToolType.ELLIPSE, KeyEvent.VK_E));
+        myToolsAction.add(new ToolAction("Eraser", new ImageIcon("./images/eraser.gif"), 
+        		ToolType.ERASER, KeyEvent.VK_A));
         // anonymous inner class in use here
         myExitAction = new AbstractAction(EXIT_STRING, new ImageIcon("./images/exit.gif")) {
 
@@ -123,36 +124,6 @@ public class ToolBarFrame extends JFrame {
 
         return bar;
     }
-
-    /**
-     * @return a fully-stocked menu bar.
-     */
-    private JMenuBar createMenuBar() {
-        final JMenuBar menuBar = new JMenuBar();
-
-        // setup the file menu
-        final JMenu fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-        
-        fileMenu.add(myExitAction);
-        menuBar.add(fileMenu);
-
-        // setup the color menu
-        final JMenu colorMenu = new JMenu("Color");
-        colorMenu.setMnemonic(KeyEvent.VK_O);
-        
-        final ButtonGroup btngrp = new ButtonGroup();
-
-        for (final Action ca : myToolsAction) {
-            final JRadioButtonMenuItem btn = new JRadioButtonMenuItem(ca);
-            btngrp.add(btn);
-            colorMenu.add(btn);
-        }
-        menuBar.add(colorMenu);
-
-        return menuBar;
-    }
-
     // main()
 
 
@@ -173,7 +144,7 @@ public class ToolBarFrame extends JFrame {
          * @param theIcon The icon.
          */
         private final ToolType myTool;
-        ToolAction(final String theName, final Icon theIcon, ToolType theTool) {
+        ToolAction(final String theName, final Icon theIcon, ToolType theTool, int theMnemonic) {
             super(theName);
             
             // small icons are usually assigned to the menu
@@ -187,8 +158,7 @@ public class ToolBarFrame extends JFrame {
             putValue(Action.LARGE_ICON_KEY, largeIcon);
             
             // set a mnemonic on the first character of the name
-            putValue(Action.MNEMONIC_KEY,
-                     KeyEvent.getExtendedKeyCodeForChar(theName.charAt(0)));
+            putValue(Action.MNEMONIC_KEY, theMnemonic);
             
             // tool tips
             putValue(Action.SHORT_DESCRIPTION, theName + " background");
