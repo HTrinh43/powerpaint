@@ -44,7 +44,7 @@ public class DrawingArea extends JPanel{
     private static final int HEIGHT = 500;
 
     /** The length of the square's sides. */
-    private static int myCursorThickness = 1;
+    private static int myCursorThickness;
     
     /** The minimum size this component should be. */
     private static final Dimension MIN_SIZE = new Dimension(WIDTH, HEIGHT);
@@ -168,6 +168,18 @@ public class DrawingArea extends JPanel{
      */
     class MyMouseInputAdapter extends MouseInputAdapter {
         
+    	/**
+    	 * 
+    	 * @param theEvent: Mouse Event
+    	 * @return color depending on right or left mouse
+    	 */
+    	private Color detectMouseButton(final MouseEvent theEvent) {
+    		Color color = myPrimaryColor;
+            //detect left or right mouse
+             if (theEvent.getButton() == MouseEvent.BUTTON3)
+             	color = mySecondaryColor;
+             return color;
+    	}
 
         @Override
         public void mousePressed(final MouseEvent theEvent) {        	        	
@@ -177,7 +189,7 @@ public class DrawingArea extends JPanel{
         }
         
         @Override
-        public void mouseMoved(MouseEvent theEvent) {
+        public void mouseMoved(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
             repaint();
         }
@@ -186,10 +198,8 @@ public class DrawingArea extends JPanel{
         public void mouseDragged(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
             myCurrentTool.setEndPoint(theEvent.getPoint());
-            Color color = myPrimaryColor;
-            if (theEvent.getButton() == MouseEvent.BUTTON3)
-            	color = mySecondaryColor;
-            
+            Color color = detectMouseButton(theEvent);
+
             if (myCurrentTool.getName() == ToolType.PENCIL.getTool()) {
             	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
@@ -204,10 +214,7 @@ public class DrawingArea extends JPanel{
         @Override
         public void mouseReleased(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
-            Color color = myPrimaryColor;
-            if (theEvent.getButton() == MouseEvent.BUTTON3)
-            	color = mySecondaryColor;
-            
+            Color color = detectMouseButton(theEvent);
             if (myCurrentTool.getName() == ToolType.LINE.getTool() 
             		|| myCurrentTool.getName() == ToolType.ELLIPSE.getTool()
             		|| myCurrentTool.getName() == ToolType.RECTANGLE.getTool()) {

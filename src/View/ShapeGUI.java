@@ -45,6 +45,7 @@ public class ShapeGUI extends JFrame {
         this.setVisible(true);
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
     }
     
     public void start() {
