@@ -62,7 +62,7 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
         }
         myToolBar = new ToolBarFrame(myToolActions);
         
-        myMenuBar = new MenuBar(myToolActions, myColorActions);
+        myMenuBar = new MenuBar(myToolActions, myColorActions, myPanel);
         myPencilTool = new PencilTool();
         add(myPanel, BorderLayout.CENTER);
         add(myToolBar, BorderLayout.SOUTH);   

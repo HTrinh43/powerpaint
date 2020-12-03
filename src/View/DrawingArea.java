@@ -55,6 +55,8 @@ public class DrawingArea extends JPanel{
     /** The squares starting center y. */
     private static final int START_Y;
     
+    private static final String PROPERTY_CLEAR = "CLEAR";
+    
     private int myThickness;
     
     private Color myBackgroundColor;
@@ -127,6 +129,9 @@ public class DrawingArea extends JPanel{
     		g2d.draw(s.getShape());
     	}
         g2d.draw(myCurrentTool.getShape());
+        
+        firePropertyChange(PROPERTY_CLEAR, 
+        		(myPreviousShapes.size() == 0), !(myPreviousShapes.size() == 0));
     }
     
     @Override
@@ -155,6 +160,11 @@ public class DrawingArea extends JPanel{
     public void setThickness(final int theThickness) {
     	myThickness = theThickness;
 
+    }
+    
+    public void clear() {
+    	myPreviousShapes.clear();
+    	repaint();
     }
 
     /**
@@ -201,7 +211,6 @@ public class DrawingArea extends JPanel{
             if (myCurrentTool.getName() == ToolType.PENCIL.getTool().getName()) {
             	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
-            	System.out.println(myCurrentTool);
             }
             else if (myCurrentTool.getName() == ToolType.ERASER.getTool().getName()) {
             	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), myBackgroundColor, myThickness));

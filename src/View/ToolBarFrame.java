@@ -7,9 +7,11 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -56,9 +58,7 @@ public class ToolBarFrame extends JToolBar {
 
     /** A list of color actions. */
     private List<Action> myToolsAction;
-    
-//    private ShapeGUI myPane;
-
+ 
     // Constructor
 
     /**
@@ -72,57 +72,34 @@ public class ToolBarFrame extends JToolBar {
         for (final PaintTool p : theMap.keySet()) {
 
             final JRadioButtonMenuItem item = new JRadioButtonMenuItem(theMap.get(p));
-
+            item.setIcon(new ImageIcon(setUpImage(p), p.getName()));
             add(item);
             toolGroup.add(item);
         }
     }
 
     /**
-     * Sets up all the Actions.
-     */
-//    private void setupActions(final Map<PaintTool, ToolActions> theMap) {
-//    	
-//    	//adding toolbar here
-//
-//        // anonymous inner class in use here
-//        myExitAction = new AbstractAction(EXIT_STRING, new ImageIcon("./images/exit.gif")) {
-//
-//            /** A generated serialization ID. */
-//            private static final long serialVersionUID = -3641127125217134863L;
-//
-//            @Override
-//            public void actionPerformed(final ActionEvent theEvent) {
-//                // close this Window
-//                dispatchEvent(new WindowEvent(ToolBarFrame.this, WindowEvent.WINDOW_CLOSING)); 
-//                // do NOT call System.exit()
-//            }
-//        };
-//
-//        myExitAction.putValue(Action.SHORT_DESCRIPTION, EXIT_STRING);
-//        myExitAction.putValue(Action.ACCELERATOR_KEY,
-//                                KeyStroke.getKeyStroke('Q',
-//                                                       java.awt.event.InputEvent.CTRL_MASK));
-//    }
-
-    /**
      * @return a fully-stocked tool bar.
      */
-	private JToggleButton createToolMenu(final PaintTool theTool, final Map<PaintTool, ToolActions> theMap ) {
-		
-        final JToggleButton button = new JToggleButton();
-
-        //Add the action for this Direction. 
-        	button.setAction(theMap.get(theTool));
-            button.setText(theTool.getName());
-        return button;
-	}
-    // main()
-
-
-    /**
-     * Sets the background of the panel to the specified color.
-     */
- 
+    private URL setUpImage(final PaintTool theTool) {
+        final String imgLocation = "images/"
+                        + theTool.getName().toLowerCase()
+                        + ".gif";
+        
+        //When using ShapeGUI.class.getResource, runtime 
+        //is expecting the images to be in the same location as the 
+        //.class file for THIS class. In an eclipse project, that is
+        //bin/*package folder*
+//        final URL imageURL = Paths.get(string).toUri().toURL();;
+        final URL imageURL = ShapeGUI.class.getResource(imgLocation);
+        if (Objects.nonNull(imageURL)) {                      
+            //image found
+        	return imageURL;
+        } else {                                     
+            //no image found
+            System.err.println("Oops");
+            return imageURL;
+        }  
+    }
 
 }
