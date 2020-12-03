@@ -2,6 +2,7 @@ package ControllerTools;
 
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
@@ -9,8 +10,8 @@ import Model.ToolType;
 
 public class RectangleTool extends AbstractPaintTool {
 
-    public RectangleTool(ToolType theName, int theMnemonic) {
-		super(theName, theMnemonic);
+    public RectangleTool() {
+		super(ToolType.RECTANGLE, KeyEvent.VK_R);
 	}
 
 	@Override

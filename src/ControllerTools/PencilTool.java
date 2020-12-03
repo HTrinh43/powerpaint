@@ -1,14 +1,15 @@
 package ControllerTools;
 
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 
 import Model.ToolType;
 
 public class PencilTool extends AbstractPaintTool {
 	
-    public PencilTool(ToolType theName, int theMnemonic) {
-		super(theName, theMnemonic);
+    public PencilTool() {
+		super(ToolType.PENCIL, KeyEvent.VK_P);
 		
 	}
 

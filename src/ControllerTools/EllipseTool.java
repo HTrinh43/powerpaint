@@ -2,6 +2,7 @@ package ControllerTools;
 
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 
 import ControllerTools.AbstractPaintTool;
@@ -9,8 +10,8 @@ import Model.ToolType;
 
 public class EllipseTool extends AbstractPaintTool {
 
-    public EllipseTool(ToolType theName, int theMnemonic) {
-		super(theName, theMnemonic);
+    public EllipseTool() {
+		super(ToolType.ELLIPSE, KeyEvent.VK_E);
 	}
 
 	@Override

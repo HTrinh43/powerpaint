@@ -60,10 +60,7 @@ public class DrawingArea extends JPanel{
     private Color myBackgroundColor;
     
     private PaintTool myCurrentTool;
-//    private LineTool myLineTool;
-//    private PencilTool myPencilTool;
-//    private EllipseTool myEllipseTool;
-//    private RectangleTool myRectangleTool;
+
     private Color myPrimaryColor;
     private final List<ShapeModel> myPreviousShapes;
     
@@ -74,27 +71,25 @@ public class DrawingArea extends JPanel{
     private Point mySquareCenterPoint;
 
 	private Color mySecondaryColor;
+	
+	private Color myCurrentColor;
     
     public DrawingArea() {
         super();
         setBackground(Color.white);
         setOpaque(true);
-        //setup tools
-//        myPencilTool = new PencilTool(ToolType.PENCIL, KeyEvent.VK_P);
-//        myLineTool = new LineTool(ToolType.LINE, KeyEvent.VK_L);
-//        myEllipseTool = new EllipseTool(ToolType.ELLIPSE, KeyEvent.VK_E);
-//        myRectangleTool = new RectangleTool(ToolType.RECTANGLE, KeyEvent.VK_R);
-        //
+
         myPreviousShapes = new ArrayList<>();
 
         mySquareCenterPoint = new Point(START_X, START_Y);  
         
         myCurrentTool = null;
         
-        myThickness = 1;
+        myThickness = 10;
         
         myBackgroundColor = this.getBackground();
         
+        myCurrentColor = UWColors.PURPLE.getColor();
         myPrimaryColor = UWColors.PURPLE.getColor();
         mySecondaryColor = UWColors.GOLD.getColor();
         
@@ -121,9 +116,9 @@ public class DrawingArea extends JPanel{
                       myCursorThickness, myCursorThickness);
         
         g2d.fill(square);
-
+		g2d.setColor(myCurrentColor);
         //line thickness
-    	if (myCurrentTool.getName() != ToolType.ERASER.getTool()) {
+    	if (myCurrentTool.toString() != ToolType.ERASER.toString()) {
     		g2d.setColor(myPrimaryColor);
     	}
     	for (ShapeModel s : myPreviousShapes) {
@@ -146,23 +141,22 @@ public class DrawingArea extends JPanel{
     
     public void setCurrentTool(final PaintTool theTool) {
         myCurrentTool = theTool;
+
     }
     
     public void setPrimaryColor(final Color theColor) {
     	myPrimaryColor = theColor;
     }
     
-	public void setSecondaryColor(Color theColor) {
+	public void setSecondaryColor(final Color theColor) {
 		mySecondaryColor = theColor;
 	}
     
-    public void setThickness(int theThickness) {
+    public void setThickness(final int theThickness) {
     	myThickness = theThickness;
+
     }
-    
-    public void setCursorThickness() {
-    	myCursorThickness = myThickness;
-    }
+
     /**
      * Mouse Adapter to handle Mouse Events and move the square around. 
      */
@@ -173,12 +167,15 @@ public class DrawingArea extends JPanel{
     	 * @param theEvent: Mouse Event
     	 * @return color depending on right or left mouse
     	 */
-    	private Color detectMouseButton(final MouseEvent theEvent) {
-    		Color color = myPrimaryColor;
+    	private void detectMouseButton(final MouseEvent theEvent) {
+
             //detect left or right mouse
-             if (theEvent.getButton() == MouseEvent.BUTTON3)
-             	color = mySecondaryColor;
-             return color;
+             if (theEvent.getButton() == MouseEvent.BUTTON3) {
+             	myCurrentColor = mySecondaryColor;
+             }
+             else
+            	 myCurrentColor = myPrimaryColor;
+
     	}
 
         @Override
@@ -198,13 +195,15 @@ public class DrawingArea extends JPanel{
         public void mouseDragged(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
             myCurrentTool.setEndPoint(theEvent.getPoint());
-            Color color = detectMouseButton(theEvent);
-
-            if (myCurrentTool.getName() == ToolType.PENCIL.getTool()) {
+            detectMouseButton(theEvent);
+            Color color = myCurrentColor;
+//change == to Equals
+            if (myCurrentTool.getName() == ToolType.PENCIL.getTool().getName()) {
             	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
+            	System.out.println(myCurrentTool);
             }
-            else if (myCurrentTool.getName() == ToolType.ERASER.getTool()) {
+            else if (myCurrentTool.getName() == ToolType.ERASER.getTool().getName()) {
             	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), myBackgroundColor, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
             }
@@ -214,10 +213,11 @@ public class DrawingArea extends JPanel{
         @Override
         public void mouseReleased(final MouseEvent theEvent) {
             mySquareCenterPoint = getCenterPoint(theEvent);
-            Color color = detectMouseButton(theEvent);
-            if (myCurrentTool.getName() == ToolType.LINE.getTool() 
-            		|| myCurrentTool.getName() == ToolType.ELLIPSE.getTool()
-            		|| myCurrentTool.getName() == ToolType.RECTANGLE.getTool()) {
+            detectMouseButton(theEvent);
+            Color color = myCurrentColor;
+            if (myCurrentTool.getName() == ToolType.LINE.getTool().getName() 
+            		|| myCurrentTool.getName() == ToolType.ELLIPSE.getTool().getName()
+            		|| myCurrentTool.getName() == ToolType.RECTANGLE.getTool().getName()) {
             	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
         }
         }

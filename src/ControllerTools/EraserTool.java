@@ -1,14 +1,15 @@
 package ControllerTools;
 
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 
 import Model.ToolType;
 
 public class EraserTool extends AbstractPaintTool {
 	
-    public EraserTool(ToolType theName, int theMnemonic) {
-		super(theName, theMnemonic);
+    public EraserTool() {
+		super(ToolType.ERASER, KeyEvent.VK_A);
 		
 	}
 

@@ -22,7 +22,7 @@ public class AbstractPaintTool implements PaintTool {
 	 */
 	@Override
 	public String getName() {
-		return myName.getTool();
+		return myName.toString();
 	}
 
 	/**
