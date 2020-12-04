@@ -3,6 +3,7 @@ package View;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -70,7 +71,6 @@ public class DrawingArea extends JPanel{
         START_X = WIDTH / 2 - myCursorThickness / 2;
         START_Y = HEIGHT / 2 - myCursorThickness / 2;
     }
-    private Point mySquareCenterPoint;
 
 	private Color mySecondaryColor;
 	
@@ -83,7 +83,6 @@ public class DrawingArea extends JPanel{
 
         myPreviousShapes = new ArrayList<>();
 
-        mySquareCenterPoint = new Point(START_X, START_Y);  
         
         myCurrentTool = null;
         
@@ -113,11 +112,7 @@ public class DrawingArea extends JPanel{
                              RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Starting Painting things!
-        final Rectangle2D square = new Rectangle2D.Double(
-                      mySquareCenterPoint.getX(), mySquareCenterPoint.getY(), 
-                      myCursorThickness, myCursorThickness);
-        
-        g2d.fill(square);
+
 		g2d.setColor(myCurrentColor);
         //line thickness
     	if (myCurrentTool.toString() != ToolType.ERASER.toString()) {
@@ -172,6 +167,10 @@ public class DrawingArea extends JPanel{
      */
     class MyMouseInputAdapter extends MouseInputAdapter {
         
+    	
+    	private boolean zeroThickness() {
+    		return myThickness == 0;
+    	}
     	/**
     	 * 
     	 * @param theEvent: Mouse Event
@@ -189,21 +188,23 @@ public class DrawingArea extends JPanel{
     	}
 
         @Override
-        public void mousePressed(final MouseEvent theEvent) {        	        	
-            mySquareCenterPoint = getCenterPoint(theEvent);
+        public void mousePressed(final MouseEvent theEvent) {  
+        	if (zeroThickness())
+        		return;
             myCurrentTool.setStartPoint(theEvent.getPoint());
             repaint();
         }
         
         @Override
         public void mouseMoved(final MouseEvent theEvent) {
-            mySquareCenterPoint = getCenterPoint(theEvent);
+        	setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             repaint();
         }
         
         @Override
         public void mouseDragged(final MouseEvent theEvent) {
-            mySquareCenterPoint = getCenterPoint(theEvent);
+        	if (zeroThickness())
+        		return;
             myCurrentTool.setEndPoint(theEvent.getPoint());
             detectMouseButton(theEvent);
             Color color = myCurrentColor;
@@ -221,7 +222,8 @@ public class DrawingArea extends JPanel{
         
         @Override
         public void mouseReleased(final MouseEvent theEvent) {
-            mySquareCenterPoint = getCenterPoint(theEvent);
+        	if (zeroThickness())
+        		return;
             detectMouseButton(theEvent);
             Color color = myCurrentColor;
             if (myCurrentTool.getName() == ToolType.LINE.getTool().getName() 

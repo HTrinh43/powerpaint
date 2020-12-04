@@ -32,7 +32,11 @@ public class ToolActions extends AbstractAction{
     	myTool = theTool;
         putValue(NAME, myTool.getName());
         putValue(SHORT_DESCRIPTION, myTool.getName());
-        putValue(SELECTED_KEY, true);
+        if (myTool.getName() == ToolType.LINE.toString()) {
+            putValue(SELECTED_KEY, true);
+        }
+        else
+        	putValue(SELECTED_KEY, false);
 
     }
     

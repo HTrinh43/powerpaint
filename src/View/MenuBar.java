@@ -47,7 +47,8 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	public MenuBar(final Map<PaintTool, ToolActions> theMap, final ColorChooserAction[] theColor, final DrawingArea theDrawingArea) {
 		myDrawingArea = theDrawingArea;
 		createSlider(myDrawingArea);
-		this.add(createMenuBar(theMap, theColor));
+		JMenuBar inMenuBar = createMenuBar(theMap, theColor);
+		add(inMenuBar);
 	}
 	
 	public JMenuBar createMenuBar(final Map<PaintTool, ToolActions> theMap, final ColorChooserAction[] theColor) {
@@ -124,14 +125,10 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         menu.setMnemonic('T');
         final ButtonGroup toolGroup = new ButtonGroup();
         for (final PaintTool p : theMap.keySet()) {
-
             final JRadioButtonMenuItem item = new JRadioButtonMenuItem(theMap.get(p));
-            if (p.getName().equals(ToolType.PENCIL.toString()))
-            	item.setEnabled(true);
             menu.add(item);
             toolGroup.add(item);
         }
-
         return menu;
 	}
 	

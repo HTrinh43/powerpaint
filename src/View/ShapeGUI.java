@@ -40,7 +40,7 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
     
     private final MenuBar myMenuBar;
     /** A tool for drawing lines. */
-    private PencilTool myPencilTool;
+    private LineTool myLineTool;
 
     private ColorChooserAction[] myColorActions;
 
@@ -63,7 +63,7 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
         myToolBar = new ToolBarFrame(myToolActions);
         
         myMenuBar = new MenuBar(myToolActions, myColorActions, myPanel);
-        myPencilTool = new PencilTool();
+        myLineTool = new LineTool();
         add(myPanel, BorderLayout.CENTER);
         add(myToolBar, BorderLayout.SOUTH);   
         this.setVisible(true);
@@ -76,7 +76,7 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
        
 //        myToolBar.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //set tool
-        myPanel.setCurrentTool(myPencilTool);
+        myPanel.setCurrentTool(myLineTool);
 //        final JToolBar toolBar = myToolBar.createToolBar();
      
 //        JMenuBar myJmenubar = myMenuBar.createMenuBar();
