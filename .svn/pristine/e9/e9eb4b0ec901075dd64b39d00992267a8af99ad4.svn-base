@@ -29,6 +29,7 @@ public class ColorChooserAction extends AbstractAction {
     
     private final String PRIMARY_COLOR = "Primary Color";
     
+    private final String SECONDARY_COLOR = "Secondary Color";
     /**
      * Initializes the Actions Fields.
      * @param theText the Text for this Action. 

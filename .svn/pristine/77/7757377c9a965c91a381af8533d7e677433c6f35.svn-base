@@ -22,6 +22,8 @@ public class ToolActions extends AbstractAction{
 	 * 
 	 */
 	private static final long serialVersionUID = 7033899212114438077L;
+
+    private static final String ERROR_MESSAGE = "Resource not found: "; 
     
     private final PaintTool myTool;
     

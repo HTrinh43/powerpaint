@@ -7,8 +7,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +46,18 @@ public class ToolBarFrame extends JToolBar {
     
     /** A generated serialization ID. */
     private static final long serialVersionUID = -4447570618384470786L;
+
+    /** A constant for the string "Exit". */
+    private static final String EXIT_STRING = "Exit";
+
+    /** The panel used inside the frame. */
+//    private final JPanel myPanel;
+
+    /** The exit action. */
+    private Action myExitAction;
+
+    /** A list of color actions. */
+    private List<Action> myToolsAction;
  
     // Constructor
 
@@ -62,7 +72,6 @@ public class ToolBarFrame extends JToolBar {
         for (final PaintTool p : theMap.keySet()) {
 
             final JRadioButtonMenuItem item = new JRadioButtonMenuItem(theMap.get(p));
-            System.out.println(setUpImage(p));
             item.setIcon(new ImageIcon(setUpImage(p), p.getName()));
             add(item);
             toolGroup.add(item);
@@ -73,22 +82,22 @@ public class ToolBarFrame extends JToolBar {
      * @return a fully-stocked tool bar.
      */
     private URL setUpImage(final PaintTool theTool) {
-        final String imgLocation = System.getProperty("user.dir") + "/images/"
+        final String imgLocation = "images/"
                         + theTool.getName().toLowerCase()
                         + ".gif";
         
-        URL imageURL = null;
-		try {
-			imageURL = new File(imgLocation).toURI().toURL();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        //When using ShapeGUI.class.getResource, runtime 
+        //is expecting the images to be in the same location as the 
+        //.class file for THIS class. In an eclipse project, that is
+        //bin/*package folder*
+//        final URL imageURL = Paths.get(string).toUri().toURL();;
+        final URL imageURL = ShapeGUI.class.getResource(imgLocation);
         if (Objects.nonNull(imageURL)) {                      
             //image found
         	return imageURL;
-        } else {   
-        	System.err.println("No Image Found");
+        } else {                                     
+            //no image found
+            System.err.println("Oops");
             return imageURL;
         }  
     }
