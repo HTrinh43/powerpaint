@@ -3,9 +3,9 @@ package View;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
@@ -17,25 +17,31 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeListener;
 
-import Model.ToolType;
-import Actions.ColorChooserAction;
-import Actions.ToolActions;
+import Actions.*;
 
 import ControllerTools.PaintTool;
+import Model.ToolType;
 
-
-
+/**
+ * A menubar that has three menus: Options, Tools, Help
+ * 
+ * @author Alex Trinh, Natalie Nguyen Hong
+ * @version Fall 2020
+ */
 public class MenuBar  extends JMenuBar implements ActionListener, PropertyChangeListener{
 	
 	/**
-	 * 
+	 * A generated serial version UID for object Serialization. 
 	 */
 	private static final long serialVersionUID = 2445544222417987308L;
 	
+	/** The default thickness. */
 	private final int DEFAULT_THICKNESS = 10;
 
+	/** The maximum value of thickness slider. */
 	private final int MAXIMUM_SLIDER_VALUE = 20;
 	
+	/** The minimum value of thickness slider. */
 	private final int MINIMUM_SLIDER_VALUE = 0;
 	
 	private JSlider mySlider;
@@ -44,6 +50,13 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	
 	private final DrawingArea myDrawingArea;
    
+	/**
+	 * Build the menu bar for this GUI.
+	 * 
+	 * @param theMap the map of ToolAction
+	 * @param theColor the color action
+	 * @param theDrawingArea the drawing panel
+	 */
 	public MenuBar(final Map<PaintTool, ToolActions> theMap, final ColorChooserAction[] theColor, final DrawingArea theDrawingArea) {
 		myDrawingArea = theDrawingArea;
 		createSlider(myDrawingArea);
@@ -51,21 +64,33 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 		add(inMenuBar);
 	}
 	
+	/**
+	 * Create the menu bar that has three menus.
+	 * 
+	 * @param theMap theMap the map of ToolAction
+	 * @param theColor the color action
+	 * @return the menu bar 
+	 */
 	public JMenuBar createMenuBar(final Map<PaintTool, ToolActions> theMap, final ColorChooserAction[] theColor) {
-		final JMenuBar menuBar = new JMenuBar();
+		final JMenuBar inMenuBar = new JMenuBar();
 		
-        final JMenu optionsMenu = createOptionMenu(theColor);
+        final JMenu inOptionsMenu = createOptionMenu(theColor);
 		//Tools Menu
-		final JMenu toolsMenu = createToolMenu(theMap);
+		final JMenu inToolsMenu = createToolMenu(theMap);
         //Help Menu
-		final JMenu helpMenu = createHelpMenu();
+		final JMenu inHelpMenu = createHelpMenu();
                 
-        menuBar.add(optionsMenu);
-		menuBar.add(toolsMenu);
-		menuBar.add(helpMenu);
-		return menuBar;
+		inMenuBar.add(inOptionsMenu);
+		inMenuBar.add(inToolsMenu);
+		inMenuBar.add(inHelpMenu);
+		return inMenuBar;
 	}
 
+	/**
+	 * Create the slider to adjust the thickness. 
+	 * 
+	 * @param theDrawingArea the drawing panel
+	 */
 	private void createSlider(final DrawingArea theDrawingArea) {
 		//setup Slider
         mySlider = new JSlider(MINIMUM_SLIDER_VALUE, MAXIMUM_SLIDER_VALUE, DEFAULT_THICKNESS);
@@ -81,8 +106,12 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         mySlider.addChangeListener(cl);
 	}
 	
-
-		
+	/**
+	 * Create the option menu.
+	 * 
+	 * @param theColor the color action
+	 * @return the option menu.
+	 */
 	private JMenu createOptionMenu(final ColorChooserAction[] theColor) {
 		final JMenu optionsMenu = new JMenu("Options");
 		optionsMenu.setMnemonic(KeyEvent.VK_O);
@@ -93,48 +122,93 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         
         final JMenuItem primaryColor = buildColorMenu(theColor[0]);
         final JMenuItem secondaryColor = buildColorMenu(theColor[1]);
+        
+        //save drawing panel
+        final JMenuItem saveItem = new JMenuItem("Save");
+        
+        final ActionListener saveFileActionListener = new SaveFileAction(myDrawingArea.getList());
+        saveItem.addActionListener(saveFileActionListener);
+        
+        //load drawing panel
+        final JMenuItem loadItem = new JMenuItem("Load");
+        
+        final ActionListener loadFileActionListener = new LoadFileAction(myDrawingArea);
+        loadItem.addActionListener(loadFileActionListener);
+      
         myClearItem = new JMenuItem("Clear");
         
         myClearItem.setMnemonic(KeyEvent.VK_C);
-//        myClearItem.setEnabled(false);
+        myClearItem.setEnabled(false);
         myClearItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(final ActionEvent theEvent) {
             	myDrawingArea.clear();
+                myClearItem.setEnabled(false);
             }
         });
         
+        // Add thickness, color and clear menu
         optionsMenu.add(inThickness);
         optionsMenu.addSeparator();
         optionsMenu.add(primaryColor);
         optionsMenu.add(secondaryColor);
+        optionsMenu.add(saveItem);
+        optionsMenu.add(loadItem);
         optionsMenu.addSeparator();
         optionsMenu.add(myClearItem);
         
 		return optionsMenu;
 	}
 	
+	/**
+	 * Creates the color menu.
+	 * 
+	 * @param theColorAction the color action
+	 * @return the color menu
+	 */
     private JMenuItem buildColorMenu(final ColorChooserAction theColorAction) {
         final JMenuItem chooseColorItem = new JMenuItem(theColorAction);
         return chooseColorItem;
     } 
 	
+    /**
+     * Creates the tool menu.
+     * 
+     * @param theMap the map of tool action
+     * @return the tool menu
+     */
 	private JMenu createToolMenu(final Map<PaintTool, ToolActions> theMap ) {
 		final JMenu menu = new JMenu("Tools");
         menu.setMnemonic('T');
+        //Map contains Tool and Mnemonic for each Tool
+        final Map<String, Integer> inMnemonicKeys = new HashMap<String, Integer>();
+        inMnemonicKeys.put(ToolType.LINE.toString(), KeyEvent.VK_L);
+        inMnemonicKeys.put(ToolType.PENCIL.toString(), KeyEvent.VK_P);
+        inMnemonicKeys.put(ToolType.ELLIPSE.toString(), KeyEvent.VK_E);
+        inMnemonicKeys.put(ToolType.RECTANGLE.toString(), KeyEvent.VK_R);
+        inMnemonicKeys.put(ToolType.ERASER.toString(), KeyEvent.VK_A);
         final ButtonGroup toolGroup = new ButtonGroup();
         for (final PaintTool p : theMap.keySet()) {
             final JRadioButtonMenuItem item = new JRadioButtonMenuItem(theMap.get(p));
+            final int inMnemonic = inMnemonicKeys.get(p.getName());
+            item.setMnemonic(inMnemonic);
             menu.add(item);
             toolGroup.add(item);
         }
         return menu;
 	}
 	
+	/**
+	 * Creates the help menu.
+	 * 
+	 * @return the help menu.
+	 */
 	private JMenu createHelpMenu() {
 		final JMenu helpMenu = new JMenu("Help");
         final JMenuItem about = new JMenuItem("About");
+        
+
         
         helpMenu.setMnemonic(KeyEvent.VK_H);
         about.setMnemonic(KeyEvent.VK_A);
@@ -159,11 +233,15 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	@Override
 	public void actionPerformed(ActionEvent e) {
 	}
+	
+	/**
+	 * Updates the clear button.
+	 */
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	public void propertyChange(final PropertyChangeEvent theEvent) {
 		
-		if ("CLEAR".equals(evt.getPropertyName())) {
-            myClearItem.setEnabled((boolean) evt.getNewValue());
+		if ("CLEAR".equals(theEvent.getPropertyName())) {
+            myClearItem.setEnabled(((boolean) theEvent.getNewValue()));
         }
 	}
 }
