@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
@@ -81,7 +82,14 @@ public class DrawingArea extends JPanel{
     /**
      * Shapes List contains drawing shapes
      */
-    private final List<ShapeModel> myPreviousShapes;
+    
+    private boolean myClickedClear;
+    
+    private final Stack<ShapeModel> myTempShapes;
+    
+    private final Stack<ShapeModel> myCurrentShapes;
+    
+    private final Stack<ShapeModel> myPreviousShapes;
     
     /**
      * Current Color for drawing tool (depending on left/right mouse click)
@@ -93,12 +101,17 @@ public class DrawingArea extends JPanel{
         setBackground(Color.white);
         setOpaque(true);
 
-        myPreviousShapes = new ArrayList<>();
+        myCurrentShapes = new Stack<>();
 
+        myPreviousShapes = new Stack<>();
+        
+        myTempShapes = new Stack<>();
         
         myCurrentTool = null;
         
         myThickness = 10;
+        
+        myClickedClear = false;
         
         myBackgroundColor = this.getBackground();
         
@@ -124,14 +137,16 @@ public class DrawingArea extends JPanel{
                              RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Starting Painting things!
-    	if(myPreviousShapes.size() == 0)
+    	if(myCurrentShapes.size() == 0)
     		return;
+    	else {
+    		
 		g2d.setColor(myCurrentColor);
         //line thickness
     	if (myCurrentTool.toString() != ToolType.ERASER.toString()) {
     		g2d.setColor(myPrimaryColor);
     	}
-    	for (ShapeModel s : myPreviousShapes) {
+    	for (ShapeModel s : myCurrentShapes) {
     		g2d.setStroke(new BasicStroke(s.getThickness()));
     		g2d.setColor(s.getColor());
     		g2d.draw(s.getShape());
@@ -139,7 +154,19 @@ public class DrawingArea extends JPanel{
         g2d.draw(myCurrentTool.getShape());
 
         firePropertyChange(PROPERTY_IS_CLEAR, 
+        		(myCurrentShapes.size() == 0), !(myCurrentShapes.size() == 0));
+    	}
+    	
+        firePropertyChange("REDO_ENABLE", 
         		(myPreviousShapes.size() == 0), !(myPreviousShapes.size() == 0));
+    	
+        firePropertyChange("UNDO_IS_ENABLE", 
+        		(myCurrentShapes.size() == 0 && myTempShapes.size() == 0), 
+        		(myCurrentShapes.size() != 0 || myTempShapes.size() != 0));
+//        
+//        firePropertyChange("UNDO_IS_DISABLE", 
+//        		(myCurrentShapes.size() != 0 || myTempShapes.size() != 0), 
+//        		(myCurrentShapes.size() == 0 && myTempShapes.size() == 0));
     }
     
     @Override
@@ -183,14 +210,33 @@ public class DrawingArea extends JPanel{
      */
     public void setThickness(final int theThickness) {
     	myThickness = theThickness;
-
     }
     
     /**
      * A method that clear the drawing board
      */
     public void clear() {
-    	myPreviousShapes.clear();
+    	myTempShapes.addAll(myCurrentShapes);
+    	myCurrentShapes.clear();
+    	myClickedClear = true;
+    	repaint();
+    }
+    
+    public void undo() {
+    	if(myClickedClear) {
+    		myCurrentShapes.addAll(myTempShapes);
+    		myTempShapes.clear();
+    		myClickedClear = !myClickedClear;
+    	}
+    	else {
+    	myPreviousShapes.push(myCurrentShapes.pop());
+    	repaint();
+    	System.out.println(myCurrentShapes.size());
+    	}
+    }
+    
+    public void redo() {
+    	myCurrentShapes.push(myPreviousShapes.pop());
     	repaint();
     }
 
@@ -199,12 +245,15 @@ public class DrawingArea extends JPanel{
      * Get the Shapes List
      */
     public List<ShapeModel> getList(){
-    	return myPreviousShapes;
+    	return myCurrentShapes;
     }
-    
+    /**
+     * 
+     * @param theList, set the current list to the new list
+     */
     public void setList(final List<ShapeModel> theList){
-    	myPreviousShapes.clear();
-    	myPreviousShapes.addAll(theList);
+    	myCurrentShapes.clear();
+    	myCurrentShapes.addAll(theList);
     	repaint();
     }
     
@@ -259,11 +308,11 @@ public class DrawingArea extends JPanel{
             Color color = myCurrentColor;
 
             if (myCurrentTool.getName().equals(ToolType.PENCIL.getTool().getName())) {
-            	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
+            	myCurrentShapes.push(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
             }
             else if (myCurrentTool.getName().equals(ToolType.ERASER.getTool().getName())) {
-            	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), myBackgroundColor, myThickness));
+            	myCurrentShapes.push(new ShapeModel(myCurrentTool.getShape(), myBackgroundColor, myThickness));
             	myCurrentTool.setStartPoint(theEvent.getPoint());
             }
             repaint();
@@ -278,7 +327,7 @@ public class DrawingArea extends JPanel{
             if (myCurrentTool.getName().equals(ToolType.LINE.getTool().getName()) 
             		|| myCurrentTool.getName().equals(ToolType.ELLIPSE.getTool().getName())
             		|| myCurrentTool.getName().equals(ToolType.RECTANGLE.getTool().getName())) {
-            	myPreviousShapes.add(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
+            	myCurrentShapes.push(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
         }
         }
     }

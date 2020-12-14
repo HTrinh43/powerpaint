@@ -7,23 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
-import java.util.Locale;
-
-import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 
 import Model.ShapeModel;
 
 public class SaveFileAction implements ActionListener{
 	
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6345232786362017074L;
-	/**
-	 * 
-	 */
-
 	private final List<ShapeModel> myShapeList;
 	
 	public SaveFileAction(List<ShapeModel> theList) {
@@ -32,6 +21,7 @@ public class SaveFileAction implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
         final String fileLocation = System.getProperty("user.dir") + "/save";
 		
 		
@@ -42,6 +32,10 @@ public class SaveFileAction implements ActionListener{
 		if (result == JFileChooser.CANCEL_OPTION)
 			return;
 		String path=chooser.getSelectedFile().getAbsolutePath();
+		//add file extension
+		if (!path.endsWith(".shp"))
+			path += ".shp";
+		
 		try { 
 
             // Saving of object in a file 

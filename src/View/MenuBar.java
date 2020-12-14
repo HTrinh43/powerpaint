@@ -1,5 +1,6 @@
 package View;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -15,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeListener;
 
 import Actions.*;
@@ -48,6 +50,10 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	
 	private JMenuItem myClearItem;
 	
+	private JMenuItem myUndoItem;
+	
+	private JMenuItem myRedoItem;
+	
 	private final DrawingArea myDrawingArea;
    
 	/**
@@ -74,12 +80,18 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	public JMenuBar createMenuBar(final Map<PaintTool, ToolActions> theMap, final ColorChooserAction[] theColor) {
 		final JMenuBar inMenuBar = new JMenuBar();
 		
+		final JMenu inFileMenu = createFileMenu();
+		
+		final JMenu inEditMenu = createEditMenu();
+		
         final JMenu inOptionsMenu = createOptionMenu(theColor);
 		//Tools Menu
 		final JMenu inToolsMenu = createToolMenu(theMap);
         //Help Menu
 		final JMenu inHelpMenu = createHelpMenu();
-                
+		
+		inMenuBar.add(inFileMenu);
+		inMenuBar.add(inEditMenu);
 		inMenuBar.add(inOptionsMenu);
 		inMenuBar.add(inToolsMenu);
 		inMenuBar.add(inHelpMenu);
@@ -106,6 +118,70 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         mySlider.addChangeListener(cl);
 	}
 	
+	private JMenu createFileMenu() {
+		final JMenu fileMenu = new JMenu("File");
+        //save drawing panel
+        final JMenuItem saveItem = new JMenuItem("Save");
+        
+        final ActionListener saveFileActionListener = new SaveFileAction(myDrawingArea.getList());
+        saveItem.addActionListener(saveFileActionListener);
+        
+        //load drawing panel
+        final JMenuItem loadItem = new JMenuItem("Load");
+        
+        final ActionListener loadFileActionListener = new LoadFileAction(myDrawingArea);
+        loadItem.addActionListener(loadFileActionListener);
+      
+        fileMenu.add(saveItem);
+        fileMenu.add(loadItem);
+		return fileMenu;
+	}
+	
+	private JMenu createEditMenu() {
+		final JMenu editMenu = new JMenu("Edit");
+		myUndoItem = new JMenuItem("Undo");
+		myUndoItem.setEnabled(false);
+        myUndoItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				myDrawingArea.undo();
+			}
+        	
+        });
+        
+        myRedoItem = new JMenuItem("Redo");
+        myRedoItem.setEnabled(false);
+        myRedoItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				myDrawingArea.redo();
+			}
+        });
+        
+        editMenu.add(myUndoItem);
+        editMenu.add(myRedoItem);
+        
+        String os = System.getProperty("os.name");
+        if (os.equals("Mac OS X")) {
+        	KeyStroke undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            myUndoItem.setAccelerator(undoKeyStroke);
+            KeyStroke redoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            myRedoItem.setAccelerator(redoKeyStroke);
+        }
+        else {
+        	KeyStroke undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK);
+            myUndoItem.setAccelerator(undoKeyStroke);
+            KeyStroke redoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK);
+            myRedoItem.setAccelerator(redoKeyStroke);
+        }
+        
+         System.out.println("Using System Property: " + os);
+		return editMenu;
+	}
+	
+	
 	/**
 	 * Create the option menu.
 	 * 
@@ -123,20 +199,7 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         final JMenuItem primaryColor = buildColorMenu(theColor[0]);
         final JMenuItem secondaryColor = buildColorMenu(theColor[1]);
         
-        //save drawing panel
-        final JMenuItem saveItem = new JMenuItem("Save");
-        
-        final ActionListener saveFileActionListener = new SaveFileAction(myDrawingArea.getList());
-        saveItem.addActionListener(saveFileActionListener);
-        
-        //load drawing panel
-        final JMenuItem loadItem = new JMenuItem("Load");
-        
-        final ActionListener loadFileActionListener = new LoadFileAction(myDrawingArea);
-        loadItem.addActionListener(loadFileActionListener);
-      
-        myClearItem = new JMenuItem("Clear");
-        
+        myClearItem = new JMenuItem("Clear");     
         myClearItem.setMnemonic(KeyEvent.VK_C);
         myClearItem.setEnabled(false);
         myClearItem.addActionListener(new ActionListener() {
@@ -148,13 +211,13 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
             }
         });
         
+        
+        
         // Add thickness, color and clear menu
         optionsMenu.add(inThickness);
         optionsMenu.addSeparator();
         optionsMenu.add(primaryColor);
         optionsMenu.add(secondaryColor);
-        optionsMenu.add(saveItem);
-        optionsMenu.add(loadItem);
         optionsMenu.addSeparator();
         optionsMenu.add(myClearItem);
         
@@ -239,9 +302,20 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	 */
 	@Override
 	public void propertyChange(final PropertyChangeEvent theEvent) {
-		
+//		System.out.println(theEvent.getPropertyName());
+//		System.out.println((boolean) theEvent.getNewValue());
 		if ("CLEAR".equals(theEvent.getPropertyName())) {
             myClearItem.setEnabled(((boolean) theEvent.getNewValue()));
         }
+		else if("REDO_ENABLE".equals(theEvent.getPropertyName())){
+			myRedoItem.setEnabled(((boolean) theEvent.getNewValue()));
+		}
+		else if("UNDO_IS_ENABLE".equals(theEvent.getPropertyName())) {
+			myUndoItem.setEnabled(((boolean) theEvent.getNewValue()));
+		}
+		else if("UNDO_IS_DISABLE".equals(theEvent.getPropertyName())) {
+			myUndoItem.setEnabled(((boolean) theEvent.getNewValue()));
+		}
+		
 	}
 }
