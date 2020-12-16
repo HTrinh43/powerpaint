@@ -43,10 +43,12 @@ public class ColorChooserAction extends AbstractAction {
         super(theText);
         myName = theText;
         myPanel = thePanel;
-        
-        putValue(MNEMONIC_KEY, KeyEvent.VK_C);
-        putValue(ACCELERATOR_KEY, 
-                 KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.ALT_MASK));
+        if (myName.equals(PRIMARY_COLOR))
+        	putValue(MNEMONIC_KEY, KeyEvent.VK_P);
+        else
+        	putValue(MNEMONIC_KEY, KeyEvent.VK_S);
+//        putValue(ACCELERATOR_KEY, 
+//                 KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.ALT_MASK));
     }
 
     /**

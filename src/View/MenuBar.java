@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -122,6 +124,7 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	
 	private JMenu createFileMenu() {
 		final JMenu fileMenu = new JMenu("File");
+		fileMenu.setMnemonic(KeyEvent.VK_F);
         //save drawing panel
         final JMenuItem saveItem = new JMenuItem("Save");
         
@@ -138,13 +141,18 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         fileMenu.add(loadItem);
 		return fileMenu;
 	}
-	
+	/**
+	 * Create Edit menu that includes Undo and Redo actions
+	 * @return Jmenu includes undo and redo buttons
+	 */
 	private JMenu createEditMenu() {
 		final JMenu editMenu = new JMenu("Edit");
+		editMenu.setMnemonic(KeyEvent.VK_E);
 		myUndoItem = new JMenuItem("Undo");
+		final ImageIcon undoIcon = getIcon("undoicon",".png",16,16);
+		myUndoItem.setIcon(undoIcon);
 		myUndoItem.setEnabled(false);
         myUndoItem.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				myDrawingArea.undo();
@@ -153,6 +161,8 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
         });
         
         myRedoItem = new JMenuItem("Redo");
+		final ImageIcon redoIcon = getIcon("redoicon",".png",16,16);
+		myRedoItem.setIcon(redoIcon);
         myRedoItem.setEnabled(false);
         myRedoItem.addActionListener(new ActionListener() {
 
@@ -192,14 +202,17 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 	private JMenu createOptionMenu(final ColorChooserAction[] theColor) {
 		final JMenu optionsMenu = new JMenu("Options");
 		optionsMenu.setMnemonic(KeyEvent.VK_O);
-		//setup thickness slider
+		//set up thickness slider
         final JMenu inThickness = new JMenu("Thickness");
         inThickness.add(mySlider);
         inThickness.setMnemonic(KeyEvent.VK_T);
-        
+        //set up color choosen button
         final JMenuItem primaryColor = buildColorMenu(theColor[0]);
-        final JMenuItem secondaryColor = buildColorMenu(theColor[1]);
-        
+        final JMenuItem secondaryColor = buildColorMenu(theColor[1]);     
+		ImageIcon icon = getIcon("color",".png",16,16);
+		primaryColor.setIcon(icon);
+		secondaryColor.setIcon(icon);
+		//set up clear button
         myClearItem = new JMenuItem("Clear");     
         myClearItem.setMnemonic(KeyEvent.VK_C);
         myClearItem.setEnabled(false);
@@ -282,21 +295,25 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "/images/w.gif");
-				//resize the icon
-				Image image = icon.getImage(); // transform it 
-				Image newImg = image.getScaledInstance(40, 30,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-				icon = new ImageIcon(newImg);
+				ImageIcon icon = getIcon("w",".gif", 40, 30);
 				JOptionPane.showMessageDialog(about,
 					    "Alex Trinh \n" 
 						+ "Autumn 2020 \n" 
 					    + "TCSS 305 Assignment 4",
 					    "About",
-					    JOptionPane.PLAIN_MESSAGE, icon);
-			}	
+					    JOptionPane.PLAIN_MESSAGE, icon);}	
         });
 		return helpMenu;
 	}
+	
+	private ImageIcon getIcon(final String theIconName, final String theExtension, final int theW, final int theH) {
+		ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "/images/" + theIconName + theExtension);
+		Image image = icon.getImage(); // transform it 
+		Image newImg = image.getScaledInstance(theW, theH,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		icon = new ImageIcon(newImg);
+		return icon;
+	}
+	
 	
 
 	@Override

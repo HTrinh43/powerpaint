@@ -85,6 +85,8 @@ public class DrawingArea extends JPanel{
     
     private boolean myClickedClear;
     
+    private boolean myRepaintTrigger;
+    
     private final Stack<ShapeModel> myTempShapes;
     
     private final Stack<ShapeModel> myCurrentShapes;
@@ -113,6 +115,8 @@ public class DrawingArea extends JPanel{
         
         myClickedClear = false;
         
+        myRepaintTrigger = false;
+        
         myBackgroundColor = this.getBackground();
         
         myCurrentColor = UWColors.PURPLE.getColor();
@@ -137,25 +141,29 @@ public class DrawingArea extends JPanel{
                              RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Starting Painting things!
-    	if(myCurrentShapes.size() == 0)
-    		return;
-    	else {
+//    	if(myCurrentShapes.size() == 0)
+//    		return;
+//    	else {
     		
 		g2d.setColor(myCurrentColor);
         //line thickness
-    	if (myCurrentTool.toString() != ToolType.ERASER.toString()) {
+		g2d.setStroke(new BasicStroke(this.myThickness));
+    	if (myCurrentTool.toString().equals(ToolType.ERASER.toString())) {
     		g2d.setColor(myPrimaryColor);
     	}
+    	
+
     	for (ShapeModel s : myCurrentShapes) {
     		g2d.setStroke(new BasicStroke(s.getThickness()));
     		g2d.setColor(s.getColor());
     		g2d.draw(s.getShape());
     	}
-        g2d.draw(myCurrentTool.getShape());
+    	
+    	if (myRepaintTrigger == true)
+    		g2d.draw(myCurrentTool.getShape());
 
         firePropertyChange(PROPERTY_IS_CLEAR, 
-        		(myCurrentShapes.size() == 0), !(myCurrentShapes.size() == 0));
-    	}
+        		(myCurrentShapes.size() == 0), !(myCurrentShapes.size() == 0));   	
     	
         firePropertyChange("REDO_ENABLE", 
         		(myPreviousShapes.size() == 0), !(myPreviousShapes.size() == 0));
@@ -163,10 +171,6 @@ public class DrawingArea extends JPanel{
         firePropertyChange("UNDO_IS_ENABLE", 
         		(myCurrentShapes.size() == 0 && myTempShapes.size() == 0), 
         		(myCurrentShapes.size() != 0 || myTempShapes.size() != 0));
-//        
-//        firePropertyChange("UNDO_IS_DISABLE", 
-//        		(myCurrentShapes.size() != 0 || myTempShapes.size() != 0), 
-//        		(myCurrentShapes.size() == 0 && myTempShapes.size() == 0));
     }
     
     @Override
@@ -210,6 +214,7 @@ public class DrawingArea extends JPanel{
      */
     public void setThickness(final int theThickness) {
     	myThickness = theThickness;
+    	repaint();
     }
     
     /**
@@ -227,11 +232,12 @@ public class DrawingArea extends JPanel{
     		myCurrentShapes.addAll(myTempShapes);
     		myTempShapes.clear();
     		myClickedClear = !myClickedClear;
+
     	}
     	else {
-    	myPreviousShapes.push(myCurrentShapes.pop());
-    	repaint();
-    	System.out.println(myCurrentShapes.size());
+    		final ShapeModel inShape = myCurrentShapes.pop();
+    		repaint();
+    		myPreviousShapes.push(inShape);
     	}
     }
     
@@ -290,6 +296,7 @@ public class DrawingArea extends JPanel{
         	if (zeroThickness())
         		return;
             myCurrentTool.setStartPoint(theEvent.getPoint());
+        	myRepaintTrigger = true;
             repaint();
         }
         
@@ -316,6 +323,7 @@ public class DrawingArea extends JPanel{
             	myCurrentTool.setStartPoint(theEvent.getPoint());
             }
             repaint();
+
         }
         
         @Override
@@ -328,7 +336,8 @@ public class DrawingArea extends JPanel{
             		|| myCurrentTool.getName().equals(ToolType.ELLIPSE.getTool().getName())
             		|| myCurrentTool.getName().equals(ToolType.RECTANGLE.getTool().getName())) {
             	myCurrentShapes.push(new ShapeModel(myCurrentTool.getShape(), color, myThickness));
-        }
+            }
+        	myRepaintTrigger = false;
         }
     }
 

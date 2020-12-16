@@ -71,15 +71,7 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
         myMenuBar = new MenuBar(myToolActions, myColorActions, myPanel);
         myLineTool = new LineTool();
         
-        ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "/images/w.gif");
-		//resize the icon
-		Image image = icon.getImage(); // transform it 
-		Image newImg16 = image.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);   
-		Image newImg32 = image.getScaledInstance(32, 32,  java.awt.Image.SCALE_SMOOTH); 
-		
-		final List<Image> icons = new ArrayList<Image>();
-		icons.add(newImg16);
-		icons.add(newImg32);
+        final List<Image> icons = createStatusBarIcon();
 		setIconImages(icons);
         add(myPanel, BorderLayout.CENTER);
         add(myToolBar, BorderLayout.SOUTH);   
@@ -87,6 +79,22 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+    }
+    
+    /**
+     * 
+     * @return a list of icon for status bar
+     */
+    private List<Image> createStatusBarIcon() {
+        final ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "/images/w.gif");
+		//resize the icon and adding icon to
+		final Image image = icon.getImage(); // transform it 
+		final Image newImg16 = image.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);   
+		final Image newImg32 = image.getScaledInstance(32, 32,  java.awt.Image.SCALE_SMOOTH); 		
+		final List<Image> icons = new ArrayList<Image>();
+		icons.add(newImg16);
+		icons.add(newImg32);
+		return icons;
     }
     
     /**
