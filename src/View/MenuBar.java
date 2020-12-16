@@ -1,5 +1,6 @@
 package View;
 
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -177,7 +179,6 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
             myRedoItem.setAccelerator(redoKeyStroke);
         }
         
-         System.out.println("Using System Property: " + os);
 		return editMenu;
 	}
 	
@@ -281,12 +282,17 @@ public class MenuBar  extends JMenuBar implements ActionListener, PropertyChange
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "/images/w.gif");
+				//resize the icon
+				Image image = icon.getImage(); // transform it 
+				Image newImg = image.getScaledInstance(40, 30,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+				icon = new ImageIcon(newImg);
 				JOptionPane.showMessageDialog(about,
 					    "Alex Trinh \n" 
 						+ "Autumn 2020 \n" 
 					    + "TCSS 305 Assignment 4",
 					    "About",
-					    JOptionPane.PLAIN_MESSAGE);
+					    JOptionPane.PLAIN_MESSAGE, icon);
 			}	
         });
 		return helpMenu;

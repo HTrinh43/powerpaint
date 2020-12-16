@@ -1,12 +1,18 @@
 package View;
 
 import java.awt.BorderLayout;
+import java.awt.Image;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+
 
 import Actions.ColorChooserAction;
 import Actions.ToolActions;
@@ -62,9 +68,19 @@ public class ShapeGUI extends JFrame implements PropertyChangeListener{
         	myToolActions.put(d.getTool(), new ToolActions(myPanel, d.getTool()));
         }
         myToolBar = new ToolBarFrame(myToolActions);
-        
         myMenuBar = new MenuBar(myToolActions, myColorActions, myPanel);
         myLineTool = new LineTool();
+        
+        ImageIcon icon = new ImageIcon(System.getProperty("user.dir") + "/images/w.gif");
+		//resize the icon
+		Image image = icon.getImage(); // transform it 
+		Image newImg16 = image.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);   
+		Image newImg32 = image.getScaledInstance(32, 32,  java.awt.Image.SCALE_SMOOTH); 
+		
+		final List<Image> icons = new ArrayList<Image>();
+		icons.add(newImg16);
+		icons.add(newImg32);
+		setIconImages(icons);
         add(myPanel, BorderLayout.CENTER);
         add(myToolBar, BorderLayout.SOUTH);   
         this.setVisible(true);
